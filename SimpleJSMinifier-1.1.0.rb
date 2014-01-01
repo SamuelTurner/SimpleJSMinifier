@@ -20,6 +20,7 @@
 
 ### Load some dependencies ###
 require 'net/http'
+require 'pathname'
 
 
 
@@ -41,9 +42,14 @@ imports = Array.new
 # Let the user know script has started, as it usually takes a few seconds to run
 puts "\nCombining and minifying started...\n"
 
-# Load main file using the first arg passed in
+# Use the relative path passed in to store the working directory, the root JS file name and the root JS file path
 path = ARGV.first
-file = File.new(path, "r")
+rootfile = Pathname.new(path).realpath
+workdir = File.dirname(rootfile)
+filename = path.split(/[\/\\]/).last
+
+# Load main file using the first arg passed in
+file = File.new(rootfile, "r")
 file.each do |line|
 	js << line
 
@@ -56,7 +62,8 @@ end
 # Replace each import statement with the contents of the file they point to
 imports.each do |import|
 	import_file = ""
-	file = File.new(import, "r")
+	import_path = workdir + "/" + import
+	file = File.new(import_path, "r")
 
 	file.each do |line|
 		import_file << line
@@ -71,11 +78,10 @@ resp = Net::HTTP.post_form(url, { 'input' => js })
 js = resp.body
 
 # Use the original filename to build a new filename
-filename = path.split("\\").last.gsub(".js", "")
-filename = filename + ".min.js"
+outputfile = workdir + "/" + filename.gsub(".js", "") + ".min.js"
 
 # Write out the file
-output = File.open(filename, "w")
+output = File.open(outputfile, "w")
 output << js
 output.close
 

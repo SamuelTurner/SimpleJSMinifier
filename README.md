@@ -21,7 +21,11 @@ You can also compile JS files into your root, to do so simply add a comment into
 
 So far, this does not support importing on multiple levels, so you can't have a file importing a file importing a file. Just a file importing a file.
 
+## Known Issues
+* jQuery crashes the minifying API service, so don't use this script to minify jQuery. I suggest loading it from Google's CDN.
+
 ## Changelog
 
 * V1.0.0 - Initial version.
 * V1.1.0 - Upgraded to using an API to minify the JS rather than some squiffy regexes.
+* v1.1.1 - Fixed the way file paths are handled in a few places so that you can run the script from any location and reference a root JS file in any location.
